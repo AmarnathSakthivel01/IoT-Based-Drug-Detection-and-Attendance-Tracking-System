@@ -1,0 +1,45 @@
+#include <ESP8266WiFi.h>
+#include <ThingSpeak.h>
+
+const int irSensorPin1 = D1; // Replace with your first IR sensor pin
+const int irSensorPin2 = D2; // Replace with your second IR sensor pin
+
+WiFiClient client;
+
+long myChannelNumber = 2480206;
+const char myWriteAPIKey[] = "EKRUZ7NYYG7PDXXL";
+
+void setup() {
+  Serial.begin(9600);
+  
+  WiFi.begin("Test 5G", "12345678");
+  while(WiFi.status() != WL_CONNECTED) {
+    delay(200);
+    Serial.print(".");
+  }
+  Serial.println();
+  Serial.println("NodeMCU is connected!");
+  Serial.println(WiFi.localIP());
+  
+  ThingSpeak.begin(client);
+}
+
+void loop() {
+  int irSensorValue1 = digitalRead(irSensorPin1);
+  
+  Serial.println("IR Sensor 1 Value: " + String(irSensorValue1));
+  
+  // Write IR sensor value 1 to ThingSpeak field 1
+  ThingSpeak.writeField(myChannelNumber, 1, irSensorValue1, myWriteAPIKey);
+  
+  delay(1000); // Add a delay before reading the second sensor
+  
+  int irSensorValue2 = digitalRead(irSensorPin2);
+  
+  Serial.println("IR Sensor 2 Value: " + String(irSensorValue2));
+
+  // Write IR sensor value 2 to ThingSpeak field 2
+  ThingSpeak.writeField(myChannelNumber, 2, irSensorValue2, myWriteAPIKey);
+  
+  delay(1000); // Delay for 1 second before looping
+}
